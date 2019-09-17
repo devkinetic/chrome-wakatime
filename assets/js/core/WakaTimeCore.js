@@ -81,7 +81,8 @@ class WakaTimeCore {
             loggingEnabled: config.loggingEnabled,
             loggingStyle: config.loggingStyle,
             blacklist: '',
-            whitelist: ''
+            whitelist: '',
+            idelist: '',
         }).then((items) => {
             if (items.loggingEnabled === true) {
                 changeExtensionState('allGood');
@@ -93,18 +94,34 @@ class WakaTimeCore {
 
                             var currentActiveTab = tabs[0];
                             var debug = false;
+                            var onidelist = false;
 
                             // If the current active tab has devtools open
                             if (in_array(currentActiveTab.id, this.tabsWithDevtoolsOpen)) {
                                 debug = true;
                             }
 
+                             // If the current active tab is a known web ide
+                           if (contains(currentActiveTab.url, items.idelist)) {
+                             onidelist = true;
+                            }
+
                             if (items.loggingStyle == 'blacklist') {
                                 if (! contains(currentActiveTab.url, items.blacklist)) {
-                                    this.sendHeartbeat({
-                                        url: currentActiveTab.url,
-                                        project: null,
-                                    }, debug);
+                                    if(onidelist){
+                                        this.sendHeartbeat({
+                                            url: currentActiveTab.url,
+                                            project: null,
+                                            type: 'app'
+                                        }, debug);
+                                    }else{
+                                        this.sendHeartbeat({
+                                            url: currentActiveTab.url,
+                                            project: null,
+                                        }, debug);
+                                    }
+
+                                   
                                 }
                                 else {
                                     changeExtensionState('blacklisted');
@@ -115,7 +132,11 @@ class WakaTimeCore {
                             if (items.loggingStyle == 'whitelist') {
                                 var heartbeat = this.getHeartbeat(currentActiveTab.url, items.whitelist);
                                 if (heartbeat.url) {
-                                    this.sendHeartbeat(heartbeat, debug);
+                                    if(onidelist){
+                                        heartbeat.type = 'app'
+                                    }else{
+                                        this.sendHeartbeat(heartbeat, debug);
+                                    }  
                                 }
                                 else {
                                     changeExtensionState('whitelisted');
@@ -216,6 +237,7 @@ class WakaTimeCore {
         return deferredObject.promise();
     }
 
+    
     /**
      * Given the heartbeat and logging type it creates a payload and
      * sends an ajax post request to the API.
@@ -225,19 +247,34 @@ class WakaTimeCore {
      */
     sendHeartbeat(heartbeat, debug) {
         var payload = null;
+        var type = '';
 
         this._getLoggingType().done((loggingType) => {
             // Get only the domain from the entity.
             // And send that in heartbeat
             if (loggingType == 'domain') {
+                
+                type = loggingType
+
+                if (heartbeat.type != '' ){
+                    type = heartbeat.type;
+                }
+                
                 heartbeat.url = getDomainFromUrl(heartbeat.url);
-                payload = this._preparePayload(heartbeat, 'domain', debug);
+                payload = this._preparePayload(heartbeat, type, debug);
                 console.log(payload);
                 this.sendAjaxRequestToApi(payload);
             }
             // Send entity in heartbeat
             else if (loggingType == 'url') {
-                payload = this._preparePayload(heartbeat, 'url', debug);
+              
+                type = loggingType
+               
+                if ("type" in heartbeat){
+                    type = heartbeat.type;
+                }
+
+                payload = this._preparePayload(heartbeat, type, debug);
                 console.log(payload);
                 this.sendAjaxRequestToApi(payload);
             }

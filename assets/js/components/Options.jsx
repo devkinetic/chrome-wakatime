@@ -23,6 +23,7 @@ var Options = reactCreateClass({
             theme: config.theme,
             blacklist: '',
             whitelist: '',
+            idelist: '',
             loggingType: config.loggingType,
             loggingStyle: config.loggingStyle,
             displayAlert: false,
@@ -42,6 +43,7 @@ var Options = reactCreateClass({
             theme: config.theme,
             blacklist: '',
             whitelist: '',
+            idelist: '',
             loggingType: config.loggingType,
             loggingStyle: config.loggingStyle
         }).then(function (items) {
@@ -49,6 +51,7 @@ var Options = reactCreateClass({
                 theme: items.theme,
                 blacklist: items.blacklist,
                 whitelist: items.whitelist,
+                idelist: items.idelist,
                 loggingType: items.loggingType,
                 loggingStyle: items.loggingStyle
             });
@@ -74,12 +77,14 @@ var Options = reactCreateClass({
         // Trimming blacklist and whitelist removes blank lines and spaces.
         var blacklist = that.state.blacklist.trim();
         var whitelist = that.state.whitelist.trim();
+        var idelist = that.state.idelist.trim();
 
         // Sync options with google storage.
         browser.storage.sync.set({
             theme: theme,
             blacklist: blacklist,
             whitelist: whitelist,
+            idelist: idelist,
             loggingType: loggingType,
             loggingStyle: loggingStyle
         }).then(function () {
@@ -87,7 +92,8 @@ var Options = reactCreateClass({
             that.setState({
                 theme: theme,
                 blacklist: blacklist,
-                whitelist: whitelist,
+                whitelist: whitelist, 
+                idelist: idelist,
                 loggingType: loggingType,
                 loggingStyle: loggingStyle,
                 displayAlert: true
@@ -111,6 +117,12 @@ var Options = reactCreateClass({
         this.setState({
             whitelist: sites
         });
+    },
+
+        _updateIdelistState: function(sites){
+            this.setState({
+                idelist: sites
+            });
     },
 
     render: function () {
@@ -153,6 +165,17 @@ var Options = reactCreateClass({
 
         };
 
+
+        var ideList = function () {
+            return (
+                <SitesList
+                    handleChange={that._updateIdelistState}
+                    label="Idelist"
+                    sites={that.state.idelist}
+                    helpText="Sites that you want to show in your reports as codeing." />
+            );
+        }
+
         return (
             <div className="container">
                 <div className="row">
@@ -176,6 +199,8 @@ var Options = reactCreateClass({
                             </div>
 
                             {loggingStyle()}
+
+                            {ideList()}
 
                             <div className="form-group">
                                 <label className="col-lg-2 control-label">Logging type</label>
