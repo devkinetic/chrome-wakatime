@@ -256,7 +256,7 @@ class WakaTimeCore {
                 
                 type = loggingType
 
-                if (heartbeat.type != '' ){
+                if ("type" in heartbeat){
                     type = heartbeat.type;
                 }
                 
