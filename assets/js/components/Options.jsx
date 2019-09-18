@@ -180,7 +180,7 @@ var Options = createReactClass({
                     sites={that.state.idelist}
                     helpText="Sites that you want to show in your reports as codeing." />
             );
-        }
+        };
 
         return (
             <div className="container">

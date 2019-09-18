@@ -133,7 +133,7 @@ class WakaTimeCore {
                                 var heartbeat = this.getHeartbeat(currentActiveTab.url, items.whitelist);
                                 if (heartbeat.url) {
                                     if(onidelist){
-                                        heartbeat.type = 'app'
+                                        heartbeat.type = 'app';
                                     }else{
                                         this.sendHeartbeat(heartbeat, debug);
                                     }  
@@ -254,7 +254,7 @@ class WakaTimeCore {
             // And send that in heartbeat
             if (loggingType == 'domain') {
                 
-                type = loggingType
+                type = loggingType;
 
                 if ("type" in heartbeat){
                     type = heartbeat.type;
@@ -268,7 +268,7 @@ class WakaTimeCore {
             // Send entity in heartbeat
             else if (loggingType == 'url') {
               
-                type = loggingType
+                type = loggingType;
                
                 if ("type" in heartbeat){
                     type = heartbeat.type;
