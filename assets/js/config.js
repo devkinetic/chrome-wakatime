@@ -1,14 +1,14 @@
-/* global browser */
+/* global chrome */
 //jshint esnext:true
 
 var config = {
     // Extension name
     name: 'WakaTime',
     // Extension version
-    version: browser.runtime.getManifest().version,
-    // Time for idle state of the browser
+    version: chrome.runtime.getManifest().version,
+    // Time for idle state of the chrome
     // The user is considered idle if there was
-    // no activity in the browser for x seconds
+    // no activity in the chrome for x seconds
     detectionIntervalInSeconds: 60,
     // Default logging style
     // Log all except blacklisted sites

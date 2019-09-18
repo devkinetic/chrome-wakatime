@@ -1,4 +1,4 @@
-/* global browser */
+/* global chrome */
 //jshint esnext:true
 
 var $ = require('jquery');
@@ -77,20 +77,20 @@ class WakaTimeCore {
      * and sends it to WakaTime for logging.
      */
     recordHeartbeat() {
-        browser.storage.sync.get({
+        chrome.storage.sync.get({
             loggingEnabled: config.loggingEnabled,
             loggingStyle: config.loggingStyle,
             blacklist: '',
             whitelist: '',
             idelist: '',
-        }).then((items) => {
+        }, function(items) {
             if (items.loggingEnabled === true) {
                 changeExtensionState('allGood');
 
-                browser.idle.queryState(config.detectionIntervalInSeconds).then((newState) => {
+                chrome.idle.queryState(config.detectionIntervalInSeconds).then((newState) => {
                     if (newState === 'active') {
                         // Get current tab URL.
-                        browser.tabs.query({active: true}).then((tabs) => {
+                        chrome.tabs.query({active: true}).then((tabs) => {
 
                             var currentActiveTab = tabs[0];
                             var debug = false;
@@ -228,9 +228,9 @@ class WakaTimeCore {
     _getLoggingType() {
         var deferredObject = $.Deferred();
 
-        browser.storage.sync.get({
+        chrome.storage.sync.get({
             loggingType: config.loggingType
-        }).then(function (items) {
+        }, function (items) {
             deferredObject.resolve(items.loggingType);
         });
 

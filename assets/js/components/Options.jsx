@@ -1,8 +1,10 @@
-/* global browser */
+/* global chrome */
 
 var React = require('react');
-var reactCreateClass = require('create-react-class');
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+
+var createReactClass = require('create-react-class');
+var ReactCSSTransitionGroup = require('react-transition-group/CSSTransitionGroup');
+
 
 var config = require('../config');
 
@@ -16,7 +18,7 @@ var SitesList = require('./SitesList.jsx');
  *
  * @type {*|Function}
  */
-var Options = reactCreateClass({
+var Options = createReactClass({
 
     getInitialState: function () {
         return {
@@ -39,14 +41,14 @@ var Options = reactCreateClass({
     restoreSettings: function () {
         var that = this;
 
-        browser.storage.sync.get({
+        chrome.storage.sync.get({
             theme: config.theme,
             blacklist: '',
             whitelist: '',
             idelist: '',
             loggingType: config.loggingType,
             loggingStyle: config.loggingStyle
-        }).then(function (items) {
+        }, function (items) {
             that.setState({
                 theme: items.theme,
                 blacklist: items.blacklist,
@@ -80,14 +82,14 @@ var Options = reactCreateClass({
         var idelist = that.state.idelist.trim();
 
         // Sync options with google storage.
-        browser.storage.sync.set({
+        chrome.storage.sync.set({
             theme: theme,
             blacklist: blacklist,
             whitelist: whitelist,
             idelist: idelist,
             loggingType: loggingType,
             loggingStyle: loggingStyle
-        }).then(function () {
+        }, function () {
             // Set state to be newly entered values.
             that.setState({
                 theme: theme,
@@ -144,6 +146,8 @@ var Options = reactCreateClass({
 
         var loggingStyle = function () {
 
+            var that = this;
+
             if (that.state.loggingStyle == 'blacklist') {
                 return (
                     <SitesList
@@ -162,11 +166,13 @@ var Options = reactCreateClass({
                   placeholder="http://google.com&#10;http://myproject.com@@MyProject"
                   helpText="Sites that you want to show in your reports. You can assign URL to project by adding @@YourProject at the end of line." />
             );
-
+            
         };
 
 
         var ideList = function () {
+            var that = this;
+            
             return (
                 <SitesList
                     handleChange={that._updateIdelistState}

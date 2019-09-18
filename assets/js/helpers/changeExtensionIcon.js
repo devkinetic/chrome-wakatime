@@ -1,4 +1,4 @@
-/* global browser */
+/* global chrome */
 
 var config = require('../config');
 
@@ -19,26 +19,26 @@ function changeExtensionIcon(color) {
 
         path = './graphics/wakatime-logo-38' + color + '.png';
 
-        browser.browserAction.setIcon({
+        chrome.browserAction.setIcon({
             path: path
         });
     }
 
     if (color === '') {
-        browser.storage.sync.get({
+        chrome.storage.sync.get({
             theme: config.theme
         }).then(function (items) {
             if (items.theme == config.theme) {
                 path = './graphics/wakatime-logo-38.png';
 
-                browser.browserAction.setIcon({
+                chrome.browserAction.setIcon({
                     path: path
                 });
             }
             else {
                 path = './graphics/wakatime-logo-38-white.png';
 
-                browser.browserAction.setIcon({
+                chrome.browserAction.setIcon({
                     path: path
                 });
             }
