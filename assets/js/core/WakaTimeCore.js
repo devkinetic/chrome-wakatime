@@ -12,6 +12,7 @@ var in_array = require('./../helpers/in_array');
 var contains = require('./../helpers/contains');
 
 class WakaTimeCore {
+    
 
     constructor() {
         this.tabsWithDevtoolsOpen = [];
@@ -87,10 +88,10 @@ class WakaTimeCore {
             if (items.loggingEnabled === true) {
                 changeExtensionState('allGood');
 
-                chrome.idle.queryState(config.detectionIntervalInSeconds).then((newState) => {
+                chrome.idle.queryState(config.detectionIntervalInSeconds, function(newState) {
                     if (newState === 'active') {
                         // Get current tab URL.
-                        chrome.tabs.query({active: true}).then((tabs) => {
+                        chrome.tabs.query({active: true}, function(tabs) {
 
                             var currentActiveTab = tabs[0];
                             var debug = false;

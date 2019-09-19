@@ -35,7 +35,7 @@ var Options = createReactClass({
     },
 
     componentDidMount: function () {
-        this.restoreSettings();
+        // this.restoreSettings();
     },
 
     restoreSettings: function () {
@@ -146,7 +146,6 @@ var Options = createReactClass({
 
         var loggingStyle = function () {
 
-            var that = this;
 
             if (that.state.loggingStyle == 'blacklist') {
                 return (
@@ -171,7 +170,6 @@ var Options = createReactClass({
 
 
         var ideList = function () {
-            var that = this;
             
             return (
                 <SitesList

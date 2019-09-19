@@ -6,6 +6,7 @@
  * @returns {boolean}
  */
 function in_array(needle, haystack) {
+    if(haystack !== undefined){ 
     for (var i = 0; i < haystack.length; i ++) {
         if (needle == haystack[i]) {
             return true;
@@ -13,6 +14,10 @@ function in_array(needle, haystack) {
     }
 
     return false;
+}else{
+    return false;
+}
+
 }
 
 module.exports = in_array;

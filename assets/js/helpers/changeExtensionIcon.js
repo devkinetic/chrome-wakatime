@@ -27,7 +27,7 @@ function changeExtensionIcon(color) {
     if (color === '') {
         chrome.storage.sync.get({
             theme: config.theme
-        }).then(function (items) {
+        }, function (items) {
             if (items.theme == config.theme) {
                 path = './graphics/wakatime-logo-38.png';
 
