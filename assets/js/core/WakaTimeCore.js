@@ -87,6 +87,7 @@ class WakaTimeCore {
         chrome.storage.sync.get({
             loggingEnabled: config.loggingEnabled,
             loggingStyle: config.loggingStyle,
+            projectType: config.projectType,
             blacklist: '',
             whitelist: '',
             idelist: '',
@@ -96,10 +97,10 @@ class WakaTimeCore {
                 changeExtensionState('allGood');
 
                 chrome.idle.queryState(config.detectionIntervalInSeconds, (newState) => {
-                    
+
                     if (newState === 'active') {
                         // Get current tab URL.
-                        chrome.tabs.query({active: true}, (tabs) => {
+                        chrome.tabs.query({ active: true }, (tabs) => {
 
                             var currentActiveTab = tabs[0];
                             var debug = false;
@@ -110,27 +111,29 @@ class WakaTimeCore {
                                 debug = true;
                             }
 
-                             // If the current active tab is a known web ide
-                           if (contains(currentActiveTab.url, items.idelist)) {
-                             onidelist = true;
+                            // If the current active tab is a known web ide
+                            if (contains(currentActiveTab.url, items.idelist)) {
+                                onidelist = true;
                             }
 
                             if (items.loggingStyle == 'blacklist') {
-                                if (! contains(currentActiveTab.url, items.blacklist)) {
-                                    if(onidelist){
+                                if (!contains(currentActiveTab.url, items.blacklist)) {
+                                    if (onidelist) {
                                         this.sendHeartbeat({
                                             url: currentActiveTab.url,
                                             project: null,
                                             type: 'app'
-                                        }, debug);
-                                    }else{
+                                        }, debug,
+                                            items.projectType);
+                                    } else {
                                         this.sendHeartbeat({
                                             url: currentActiveTab.url,
                                             project: null,
-                                        }, debug);
+                                        }, debug,
+                                            items.projectType);
                                     }
 
-                                   
+
                                 }
                                 else {
                                     changeExtensionState('blacklisted');
@@ -141,11 +144,12 @@ class WakaTimeCore {
                             if (items.loggingStyle == 'whitelist') {
                                 var heartbeat = this.getHeartbeat(currentActiveTab.url, items.whitelist);
                                 if (heartbeat.url) {
-                                    if(onidelist){
+                                    if (onidelist) {
                                         heartbeat.type = 'app';
-                                    }else{
-                                        this.sendHeartbeat(heartbeat, debug);
-                                    }  
+                                    } else {
+                                        this.sendHeartbeat(heartbeat, debug,
+                                            items.projectType);
+                                    }
                                 }
                                 else {
                                     changeExtensionState('whitelisted');
@@ -175,7 +179,7 @@ class WakaTimeCore {
     getHeartbeat(url, list) {
         var lines = list.split('\n');
 
-        for (var i = 0; i < lines.length; i ++) {
+        for (var i = 0; i < lines.length; i++) {
             // Trim all lines from the list one by one
             var cleanLine = lines[i].trim();
 
@@ -216,15 +220,29 @@ class WakaTimeCore {
      * @returns {*}
      * @private
      */
-    _preparePayload(heartbeat, type, debug = false) {
-        return JSON.stringify({
-            entity: heartbeat.url,
-            type: type,
-            time: moment().format('X'),
-            project: heartbeat.project || '<<LAST_PROJECT>>',
-            is_debugging: debug,
-            plugin: 'browser-wakatime/' + config.version
-        });
+    _preparePayload(heartbeat, type, debug = false, project_type = 'last', plugin = 'browser-wakatime') {
+        var json = null;
+
+        if (project_type == 'last') {
+            json = JSON.stringify({
+                entity: heartbeat.url,
+                type: type,
+                time: moment().format('X'),
+                project: heartbeat.project || '<<LAST_PROJECT>>',
+                is_debugging: debug,
+                plugin: plugin + '/' + config.version
+            });
+        } else {
+            json = JSON.stringify({
+                entity: heartbeat.url,
+                type: type,
+                time: moment().format('X'),
+                project: heartbeat.project || '',
+                is_debugging: debug,
+                plugin: plugin + '/' + config.version
+            });
+        }
+        return json;
     }
 
 
@@ -246,7 +264,25 @@ class WakaTimeCore {
         return deferredObject.promise();
     }
 
-    
+    /**
+     * Returns a promise with project type variable.
+     *
+     * @returns {*}
+     * @private
+     */
+    _getProjectType() {
+        var deferredObject = $.Deferred();
+
+        chrome.storage.sync.get({
+            projectType: config.projectType
+        }, function (items) {
+            deferredObject.resolve(items.projectType);
+        });
+
+        return deferredObject.promise();
+    }
+
+
     /**
      * Given the heartbeat and logging type it creates a payload and
      * sends an ajax post request to the API.
@@ -254,36 +290,45 @@ class WakaTimeCore {
      * @param heartbeat
      * @param debug
      */
-    sendHeartbeat(heartbeat, debug) {
+    sendHeartbeat(heartbeat, debug, project_type = 'last') {
         var payload = null;
         var type = '';
+        var plugin = 'browser-wakatime';
 
         this._getLoggingType().done((loggingType) => {
             // Get only the domain from the entity.
             // And send that in heartbeat
             if (loggingType == 'domain') {
-                
+
                 type = loggingType;
 
-                if ("type" in heartbeat){
+                if ("type" in heartbeat) {
                     type = heartbeat.type;
                 }
-                
+
+                if (type == 'app') {
+                    plugin = 'browser_ide-wakatime';
+                }
+
                 heartbeat.url = getDomainFromUrl(heartbeat.url);
-                payload = this._preparePayload(heartbeat, type, debug);
+                payload = this._preparePayload(heartbeat, type, debug, project_type, plugin);
                 console.log(payload);
                 this.sendAjaxRequestToApi(payload);
             }
             // Send entity in heartbeat
             else if (loggingType == 'url') {
-              
+
                 type = loggingType;
-               
-                if ("type" in heartbeat){
+
+                if ("type" in heartbeat) {
                     type = heartbeat.type;
                 }
 
-                payload = this._preparePayload(heartbeat, type, debug);
+                if (type == 'app') {
+                    plugin = 'browser_ide-wakatime';
+                }
+
+                payload = this._preparePayload(heartbeat, type, debug, project_type, plugin);
                 console.log(payload);
                 this.sendAjaxRequestToApi(payload);
             }

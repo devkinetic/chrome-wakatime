@@ -26,6 +26,7 @@ var Options = createReactClass({
             blacklist: '',
             whitelist: '',
             idelist: '',
+            projectType: 'last',
             loggingType: config.loggingType,
             loggingStyle: config.loggingStyle,
             displayAlert: false,
@@ -35,7 +36,7 @@ var Options = createReactClass({
     },
 
     componentDidMount: function () {
-        // this.restoreSettings();
+         this.restoreSettings();
     },
 
     restoreSettings: function () {
@@ -46,6 +47,7 @@ var Options = createReactClass({
             blacklist: '',
             whitelist: '',
             idelist: '',
+            projectType: 'last',
             loggingType: config.loggingType,
             loggingStyle: config.loggingStyle
         }, function (items) {
@@ -54,11 +56,13 @@ var Options = createReactClass({
                 blacklist: items.blacklist,
                 whitelist: items.whitelist,
                 idelist: items.idelist,
+                projectType: items.projectType,
                 loggingType: items.loggingType,
                 loggingStyle: items.loggingStyle
             });
 
             that.refs.theme.value = items.theme;
+            that.refs.projectType.value = items.projectType;
             that.refs.loggingType.value = items.loggingType;
             that.refs.loggingStyle.value = items.loggingStyle;
         });
@@ -75,6 +79,7 @@ var Options = createReactClass({
 
         var theme = this.refs.theme.value.trim();
         var loggingType = this.refs.loggingType.value.trim();
+        var projectType = this.refs.projectType.value.trim();
         var loggingStyle = this.refs.loggingStyle.value.trim();
         // Trimming blacklist and whitelist removes blank lines and spaces.
         var blacklist = that.state.blacklist.trim();
@@ -88,6 +93,7 @@ var Options = createReactClass({
             whitelist: whitelist,
             idelist: idelist,
             loggingType: loggingType,
+            projectType: projectType,
             loggingStyle: loggingStyle
         }, function () {
             // Set state to be newly entered values.
@@ -97,6 +103,7 @@ var Options = createReactClass({
                 whitelist: whitelist, 
                 idelist: idelist,
                 loggingType: loggingType,
+                projectType: projectType,
                 loggingStyle: loggingStyle,
                 displayAlert: true
             });
@@ -124,6 +131,12 @@ var Options = createReactClass({
         _updateIdelistState: function(sites){
             this.setState({
                 idelist: sites
+            });
+    },
+       
+    _updateTypeState: function(type){
+            this.setState({
+                projectType: type
             });
     },
 
@@ -179,6 +192,22 @@ var Options = createReactClass({
                     helpText="Sites that you want to show in your reports as codeing." />
             );
         };
+        
+        var projectType = function () {
+            
+            return (
+                <div className="form-group">
+                <label className="col-lg-2 control-label">Project Selection</label>
+
+                <div className="col-lg-10">
+                    <select className="form-control" ref="projectType" defaultValue="last" onChange={that._updateTypeState}>
+                        <option value="last">The last project reported to Wakatime</option>
+                        <option value="unknown">Unknown/New project</option>
+                    </select>
+                </div>
+            </div>
+            );
+        };
 
         return (
             <div className="container">
@@ -202,6 +231,8 @@ var Options = createReactClass({
                                 </div>
                             </div>
 
+                            {projectType()}
+
                             {loggingStyle()}
 
                             {ideList()}
@@ -218,7 +249,7 @@ var Options = createReactClass({
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="theme" className="col-lg-2 control-label">Theme</label>
+                                <label htmlFor="theme" className="col-lg-2 control-label">Icon Theme</label>
 
                                 <div className="col-lg-10">
                                     <select className="form-control" ref="theme" defaultValue="light">

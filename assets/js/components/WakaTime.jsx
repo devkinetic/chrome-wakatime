@@ -73,6 +73,7 @@ var Wakatime = reactCreateClass({
             }
             else {
                 changeExtensionState('notSignedIn');
+                // change the icon too
             }
         });
 

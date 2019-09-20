@@ -10,6 +10,8 @@ var config = {
     // The user is considered idle if there was
     // no activity in the chrome for x seconds
     detectionIntervalInSeconds: 60,
+    // Default Project Type
+    projectType: 'last',
     // Default logging style
     // Log all except blacklisted sites
     // or log only the white listed sites.
