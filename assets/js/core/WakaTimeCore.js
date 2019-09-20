@@ -3,6 +3,7 @@
 
 var $ = require('jquery');
 var moment = require('moment');
+
 var config = require('./../config');
 
 // Helpers
@@ -12,7 +13,6 @@ var in_array = require('./../helpers/in_array');
 var contains = require('./../helpers/contains');
 
 class WakaTimeCore {
-    
 
     constructor() {
         this.tabsWithDevtoolsOpen = [];
@@ -29,6 +29,7 @@ class WakaTimeCore {
 
     getTotalTimeLoggedToday() {
         var deferredObject = $.Deferred();
+
         var today = moment().format('YYYY-MM-DD');
 
         $.ajax({
@@ -62,10 +63,14 @@ class WakaTimeCore {
             url: config.currentUserApiUrl,
             dataType: 'json',
             success: (data) => {
+
                 deferredObject.resolve(data.data);
+
             },
             error: (xhr, status, err) => {
+
                 console.error(config.currentUserApiUrl, status, err.toString());
+
                 deferredObject.resolve(false);
             }
         });
@@ -78,20 +83,23 @@ class WakaTimeCore {
      * and sends it to WakaTime for logging.
      */
     recordHeartbeat() {
+
         chrome.storage.sync.get({
             loggingEnabled: config.loggingEnabled,
             loggingStyle: config.loggingStyle,
             blacklist: '',
             whitelist: '',
             idelist: '',
-        }, function(items) {
+        }, (items) => {
             if (items.loggingEnabled === true) {
+
                 changeExtensionState('allGood');
 
-                chrome.idle.queryState(config.detectionIntervalInSeconds, function(newState) {
+                chrome.idle.queryState(config.detectionIntervalInSeconds, (newState) => {
+                    
                     if (newState === 'active') {
                         // Get current tab URL.
-                        chrome.tabs.query({active: true}, function(tabs) {
+                        chrome.tabs.query({active: true}, (tabs) => {
 
                             var currentActiveTab = tabs[0];
                             var debug = false;
