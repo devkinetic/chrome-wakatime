@@ -1,5 +1,6 @@
 var React = require('react');
 var reactCreateClass = require('create-react-class');
+var config = require('../config');
 
 var NavBar = reactCreateClass({
 
@@ -10,7 +11,7 @@ var NavBar = reactCreateClass({
         var signedInAs = function() {
             if (that.props.loggedIn === true) {
                 return (
-                    <p className="navbar-text">Signed in as <b>{that.props.user.full_name}</b></p>
+                    <p className="navbar-text">Signed in as <b>{that.props.user.display_name}</b></p>
                 );
             }
         };
@@ -41,6 +42,14 @@ var NavBar = reactCreateClass({
             }
         };
 
+        var last_project = function() {
+            if (config.projectType == 'last') {
+                return (
+                    <p className="navbar-text"> Project: <b>{that.props.user.last_project}</b></p>
+                );
+            }
+        };
+
         return (
             <nav className="navbar navbar-default" role="navigation">
                 <div className="container-fluid">
@@ -56,6 +65,7 @@ var NavBar = reactCreateClass({
                     </div>
                     <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         {signedInAs()}
+                        {last_project()}
                         <ul className="nav navbar-nav">
                             {customRules()}
                             {dashboard()}

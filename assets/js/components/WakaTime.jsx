@@ -18,12 +18,15 @@ var changeExtensionState = require('../helpers/changeExtensionState');
 
 var Wakatime = reactCreateClass({
 
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             user: {
                 full_name: null,
                 email: null,
-                photo: null
+                photo: null,
+                display_name: null,
+                last_project: null,
+                username: null
             },
             loggedIn: false,
             loggingEnabled: config.loggingEnabled,
@@ -31,20 +34,20 @@ var Wakatime = reactCreateClass({
         };
     },
 
-    componentDidMount: function() {
+    componentDidMount: function () {
 
         var wakatime = new WakaTimeCore();
 
         var that = this;
 
-        wakatime.checkAuth().done(function(data) {
+        wakatime.checkAuth().done(function (data) {
 
             if (data !== false) {
 
                 chrome.storage.sync.get({
                     loggingEnabled: config.loggingEnabled
-                }, function(items) {
-                    that.setState({loggingEnabled: items.loggingEnabled});
+                }, function (items) {
+                    that.setState({ loggingEnabled: items.loggingEnabled });
 
                     if (items.loggingEnabled === true) {
                         changeExtensionState('allGood');
@@ -58,12 +61,15 @@ var Wakatime = reactCreateClass({
                     user: {
                         full_name: data.full_name,
                         email: data.email,
-                        photo: data.photo
+                        photo: data.photo,
+                        display_name: data.display_name,
+                        last_project: data.last_project,
+                        username: data.username
                     },
                     loggedIn: true
                 });
 
-                wakatime.getTotalTimeLoggedToday().done(function(grand_total) {
+                wakatime.getTotalTimeLoggedToday().done(function (grand_total) {
                     that.setState({
                         totalTimeLoggedToday: grand_total.text
                     });
@@ -79,7 +85,7 @@ var Wakatime = reactCreateClass({
 
     },
 
-    logoutUser: function() {
+    logoutUser: function () {
         var deferredObject = $.Deferred();
 
         var that = this;
@@ -87,12 +93,12 @@ var Wakatime = reactCreateClass({
         $.ajax({
             url: config.logoutUserUrl,
             method: 'GET',
-            success: function() {
+            success: function () {
 
                 deferredObject.resolve(that);
 
             },
-            error: function(xhr, status, err) {
+            error: function (xhr, status, err) {
 
                 console.error(config.logoutUserUrl, status, err.toString());
 
@@ -103,11 +109,11 @@ var Wakatime = reactCreateClass({
         return deferredObject.promise();
     },
 
-    _logoutUser: function() {
+    _logoutUser: function () {
 
         var that = this;
 
-        this.logoutUser().done(function(){
+        this.logoutUser().done(function () {
 
             that.setState({
                 user: {
@@ -124,7 +130,7 @@ var Wakatime = reactCreateClass({
         });
     },
 
-    _disableLogging: function() {
+    _disableLogging: function () {
         this.setState({
             loggingEnabled: false
         });
@@ -136,7 +142,7 @@ var Wakatime = reactCreateClass({
         });
     },
 
-    _enableLogging: function() {
+    _enableLogging: function () {
         this.setState({
             loggingEnabled: true
         });
@@ -148,7 +154,7 @@ var Wakatime = reactCreateClass({
         });
     },
 
-    render: function() {
+    render: function () {
         return (
             <div>
                 <NavBar
