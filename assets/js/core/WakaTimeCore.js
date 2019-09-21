@@ -51,6 +51,28 @@ class WakaTimeCore {
         return deferredObject.promise();
     }
 
+    getRanking(){
+        var deferredObject = $.Deferred();
+ 
+        $.ajax({
+            url: config.rankingUrl,
+            dataType: 'json',
+            success: (data) => {
+ 
+                deferredObject.resolve(data.data[0].rank);
+ 
+            },
+            error: (xhr, status, err) => {
+ 
+                console.error(config.currentUserApiUrl, status, err.toString());
+ 
+                deferredObject.resolve(false);
+            }
+        });
+ 
+        return deferredObject.promise();
+    }
+
     /**
      * Checks if the user is logged in.
      *
@@ -281,7 +303,6 @@ class WakaTimeCore {
 
         return deferredObject.promise();
     }
-
 
     /**
      * Given the heartbeat and logging type it creates a payload and

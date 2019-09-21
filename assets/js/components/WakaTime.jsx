@@ -30,7 +30,8 @@ var Wakatime = reactCreateClass({
             },
             loggedIn: false,
             loggingEnabled: config.loggingEnabled,
-            totalTimeLoggedToday: '0 minutes'
+            totalTimeLoggedToday: '0 minutes',
+            global_rank: null
         };
     },
 
@@ -66,12 +67,19 @@ var Wakatime = reactCreateClass({
                         last_project: data.last_project,
                         username: data.username
                     },
-                    loggedIn: true
+                    loggedIn: true,
+                    global_rank: null
                 });
 
                 wakatime.getTotalTimeLoggedToday().done(function (grand_total) {
                     that.setState({
                         totalTimeLoggedToday: grand_total.text
+                    });
+                });
+
+                wakatime.getRanking().done(function (rank) {
+                    that.setState({
+                        global_rank: rank.text
                     });
                 });
 

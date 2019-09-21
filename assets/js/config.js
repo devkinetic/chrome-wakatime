@@ -18,6 +18,8 @@ var config = {
     loggingStyle: 'blacklist',
     // Default logging type
     loggingType: 'domain',
+    // Default ranking display type
+    rankingDisplayType: 'global',
     // By default logging is enabled
     loggingEnabled: true,
     // Url to which to send the heartbeat
@@ -26,6 +28,8 @@ var config = {
     currentUserApiUrl: 'https://wakatime.com/api/v1/users/current',
     // The url to logout the user from wakatime
     logoutUserUrl: 'https://wakatime.com/logout',
+    // The url to logout the user from wakatime
+    rankingUrl: 'https://wakatime.com/api/v1/leaders',
     // Gets stats from the WakaTime API
     summariesApiUrl: 'https://wakatime.com/api/v1/users/current/summaries',
     // Different colors for different states of the extension
@@ -53,6 +57,7 @@ var config = {
         'blacklisted',
         'whitelisted'
     ],
+    languagesToDisplay: [],
     // Predefined alert type and text for success and failure.
     alert: {
         success: {

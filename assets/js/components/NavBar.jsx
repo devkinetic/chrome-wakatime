@@ -4,11 +4,11 @@ var config = require('../config');
 
 var NavBar = reactCreateClass({
 
-    render: function() {
+    render: function () {
 
         var that = this;
 
-        var signedInAs = function() {
+        var signedInAs = function () {
             if (that.props.loggedIn === true) {
                 return (
                     <p className="navbar-text">Signed in as <b>{that.props.user.display_name}</b></p>
@@ -16,7 +16,7 @@ var NavBar = reactCreateClass({
             }
         };
 
-        var dashboard = function() {
+        var dashboard = function () {
             if (that.props.loggedIn === true) {
                 return (
                     <li>
@@ -29,7 +29,7 @@ var NavBar = reactCreateClass({
             }
         };
 
-        var customRules = function() {
+        var customRules = function () {
             if (that.props.loggedIn === true) {
                 return (
                     <li>
@@ -42,12 +42,20 @@ var NavBar = reactCreateClass({
             }
         };
 
-        var last_project = function() {
+        var last_project = function () {
             if (config.projectType == 'last') {
                 return (
                     <p className="navbar-text"> Project: <b>{that.props.user.last_project}</b></p>
                 );
             }
+        };
+
+        var ranking = function () {
+
+            if (config.rankingDisplayType == 'global' && that.props.global_rank) {
+                return ( <p className="navbar-text"> Global Ranking: <b>{that.props.global_rank} / 5000 </b></p> );
+            }
+
         };
 
         return (
@@ -66,6 +74,7 @@ var NavBar = reactCreateClass({
                     <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         {signedInAs()}
                         {last_project()}
+                        {ranking()}
                         <ul className="nav navbar-nav">
                             {customRules()}
                             {dashboard()}
