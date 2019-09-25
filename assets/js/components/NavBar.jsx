@@ -4,6 +4,7 @@ var config = require('../config');
 
 var NavBar = reactCreateClass({
 
+
     render: function () {
 
         var that = this;
@@ -42,12 +43,17 @@ var NavBar = reactCreateClass({
             }
         };
 
-        var last_project = function () {
-            if (config.projectType == 'last') {
-                return (
-                    <p className="navbar-text"> Project: <b>{that.props.user.last_project}</b></p>
-                );
-            }
+        var project_name = function () {
+                
+            if(that.props.show_project_editor === false ){
+                    return (
+                        <p className="navbar-text" onClick={that.props.toggleEditor}> Project: <b>{that.props.projectName}</b></p>
+                    );
+                    }else{
+                        return (
+                            <p className="navbar-text" > Project: <input type = "text" defaultValue = {that.props.projectName} onBlur={that.props.toggleEditor} onChange={that.props.updateEditor} onKeyPress={that.props.handleKeyPress} ></input></p>
+                        );
+                    }
         };
 
         var ranking = function () {
@@ -73,7 +79,7 @@ var NavBar = reactCreateClass({
                     </div>
                     <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         {signedInAs()}
-                        {last_project()}
+                        {project_name()}
                         {ranking()}
                         <ul className="nav navbar-nav">
                             {customRules()}

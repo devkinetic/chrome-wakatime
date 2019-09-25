@@ -12,6 +12,8 @@ var config = {
     detectionIntervalInSeconds: 60,
     // Default Project Type
     projectType: 'last',
+     // Default Project Name
+    defaultProjectName: 'Unknown Project',
     // Default logging style
     // Log all except blacklisted sites
     // or log only the white listed sites.
@@ -22,6 +24,7 @@ var config = {
     rankingDisplayType: 'global',
     // By default logging is enabled
     loggingEnabled: true,
+    projectName: null,
     // Url to which to send the heartbeat
     heartbeatApiUrl: 'https://wakatime.com/api/v1/users/current/heartbeats',
     // Url from which to detect if the user is logged in
@@ -35,6 +38,7 @@ var config = {
     // Different colors for different states of the extension
     colors: {
         allGood: '',
+        allGoodOverride: 'override',
         notLogging: 'gray',
         notSignedIn: 'red',
         lightTheme: 'white'
@@ -42,6 +46,7 @@ var config = {
     // Tooltips for each of the extension states
     tooltips: {
         allGood: '',
+        allGoodOverride: 'Project name has been overridden',
         notLogging: 'Not logging',
         notSignedIn: 'Not signed In',
         blacklisted: 'This URL is blacklisted',
@@ -52,6 +57,7 @@ var config = {
     // Valid extension states
     states: [
         'allGood',
+        'allGoodOverride',
         'notLogging',
         'notSignedIn',
         'blacklisted',

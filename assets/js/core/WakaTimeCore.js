@@ -16,6 +16,7 @@ class WakaTimeCore {
 
     constructor() {
         this.tabsWithDevtoolsOpen = [];
+        this.online = false;
     }
 
     /**
@@ -29,7 +30,6 @@ class WakaTimeCore {
 
     getTotalTimeLoggedToday() {
         var deferredObject = $.Deferred();
-
         var today = moment().format('YYYY-MM-DD');
 
         $.ajax({
@@ -51,25 +51,25 @@ class WakaTimeCore {
         return deferredObject.promise();
     }
 
-    getRanking(){
+    getRanking() {
         var deferredObject = $.Deferred();
- 
+
         $.ajax({
             url: config.rankingUrl,
             dataType: 'json',
             success: (data) => {
- 
+
                 deferredObject.resolve(data.data[0].rank);
- 
+
             },
             error: (xhr, status, err) => {
- 
+
                 console.error(config.currentUserApiUrl, status, err.toString());
- 
+
                 deferredObject.resolve(false);
             }
         });
- 
+
         return deferredObject.promise();
     }
 
@@ -85,12 +85,13 @@ class WakaTimeCore {
             url: config.currentUserApiUrl,
             dataType: 'json',
             success: (data) => {
+                this.online = true;
 
                 deferredObject.resolve(data.data);
 
             },
             error: (xhr, status, err) => {
-
+                this.online = false;
                 console.error(config.currentUserApiUrl, status, err.toString());
 
                 deferredObject.resolve(false);
@@ -315,7 +316,9 @@ class WakaTimeCore {
      */
     sendHeartbeat(heartbeat, debug, project_type = 'last') {
         var payload = null;
+        var payloads = [];
         var type = '';
+        var reply = false;
         var plugin = 'browser-wakatime';
 
         this._getLoggingType().done((loggingType) => {
@@ -335,11 +338,14 @@ class WakaTimeCore {
 
                 heartbeat.url = getDomainFromUrl(heartbeat.url);
                 payload = this._preparePayload(heartbeat, type, debug, project_type, plugin);
-                console.log(payload);
+             //   console.log(payload);
                 this.sendAjaxRequestToApi(payload);
-            }
-            // Send entity in heartbeat
-            else if (loggingType == 'url') {
+                // do {
+
+                //     reply = this.sendAjaxRequestToApi(payload);
+
+                // } while (this.online == true);
+            } else if (loggingType == 'url') {
 
                 type = loggingType;
 
@@ -352,8 +358,14 @@ class WakaTimeCore {
                 }
 
                 payload = this._preparePayload(heartbeat, type, debug, project_type, plugin);
-                console.log(payload);
+               // console.log(payload);
                 this.sendAjaxRequestToApi(payload);
+                // do {
+
+                //     reply = this.sendAjaxRequestToApi(payload);
+
+                // } while (this.online == true);
+
             }
         });
     }
@@ -367,33 +379,27 @@ class WakaTimeCore {
      */
     sendAjaxRequestToApi(payload, method = 'POST') {
 
-        var deferredObject = $.Deferred();
-
-        $.ajax({
-            url: config.heartbeatApiUrl,
-            dataType: 'json',
-            contentType: 'application/json',
+        fetch(config.heartbeatApiUrl, {
             method: method,
-            data: payload,
-            statusCode: {
-                401: function () {
-                    changeExtensionState('notSignedIn');
-                },
-                201: function () {
-                    // nothing to do here
-                }
+            mode: 'cors',
+            credentials: "include",
+            cache: 'no-cache',
+            headers: {
+                "Content-Type": "application/json"
             },
-            success: (response) => {
-                deferredObject.resolve(this);
-            },
-            error: (xhr, status, err) => {
-                console.error(config.heartbeatApiUrl, status, err.toString());
-
-                deferredObject.resolve(this);
+            redirect: 'follow', // manual, *follow, error
+            referrer: 'no-referrer', // no-referrer, *client
+            body: payload,
+        }).then(function (response) {
+          //  console.log(response);
+            if(response.status == 401){
+                changeExtensionState('notSignedIn');
             }
+            return response.json();
+        }).then(function (data) {
+            console.log('Sent Heartbeat via fetch data:' + JSON.stringify(data));
         });
 
-        return deferredObject.promise();
     }
 
 }

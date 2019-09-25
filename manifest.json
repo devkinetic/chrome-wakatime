@@ -16,7 +16,8 @@
     "alarms",
     "tabs",
     "storage",
-    "idle"
+    "idle",
+    "unlimitedStorage"
   ],
   "background": {
     "scripts": [

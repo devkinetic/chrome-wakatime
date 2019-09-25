@@ -3,6 +3,7 @@
 // Core
 var WakaTimeCore = require("./core/WakaTimeCore").default;
 
+
 // initialize class
 var wakatime = new WakaTimeCore();
 

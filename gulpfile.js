@@ -27,6 +27,8 @@ gulp.task('webextension',function(cb){
     fs.copyFileSync('node_modules/webextension-polyfill/dist/browser-polyfill.min.js', 'public/js/browser-polyfill.min.js');
 
     fs.copyFileSync('node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map', 'public/js/browser-polyfill.min.js.map');
+     
+ //    fs.copyFileSync('vendor/bower_components/webcomponentsjs/webcomponents-min.js', 'public/js/browser-polyfill.min.js');
 });
 
 /*
@@ -55,6 +57,7 @@ elixir(function (mix) {
     mix.less('app.less');
     mix.browserify('app.jsx', 'public/js/app.js', 'assets/js');
     mix.browserify('events.js', 'public/js/events.js', 'assets/js');
+    mix.browserify('serviceWorker.js', 'public/js/service-worker.js', 'assets/js');
     mix.browserify('options.jsx', 'public/js/options.js', 'assets/js');
     mix.browserify('devtools.js', 'public/js/devtools.js', 'assets/js');
 });

@@ -8,7 +8,8 @@
     "watch": "gulp watch",
     "lint": "jsxhint --jsx-only .",
     "postinstall": "gulp postinstall",
-    "validate": "npm ls"
+    "validate": "npm ls",
+    "sw": "node sw-generate.js"
   },
   "pre-commit": [
     "lint"

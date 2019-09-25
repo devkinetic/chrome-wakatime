@@ -31,7 +31,11 @@ var Wakatime = reactCreateClass({
             loggedIn: false,
             loggingEnabled: config.loggingEnabled,
             totalTimeLoggedToday: '0 minutes',
-            global_rank: null
+            projectType: config.projectType,
+            globalRank: null,
+            defaultProjectName: config.defaultProjectName,
+            projectName: config.projectName,
+            show_project_editor: false
         };
     },
 
@@ -46,9 +50,25 @@ var Wakatime = reactCreateClass({
             if (data !== false) {
 
                 chrome.storage.sync.get({
-                    loggingEnabled: config.loggingEnabled
+                    loggingEnabled: config.loggingEnabled,
+                    projectType: config.projectType,
+                    projectName: config.projectName,
+                    defaultProjectName: config.defaultProjectName
                 }, function (items) {
-                    that.setState({ loggingEnabled: items.loggingEnabled });
+
+                    var projectName = items.projectName;
+
+                    if (items.projectName === null) {
+                        if(items.projectType == 'last')
+                        {
+                            projectName = data.last_project;
+                        }else{
+                            projectName = items.defaultProjectName;
+                        }
+                        
+                    }
+
+                    that.setState({ loggingEnabled: items.loggingEnabled, projectName: projectName});
 
                     if (items.loggingEnabled === true) {
                         changeExtensionState('allGood');
@@ -57,6 +77,7 @@ var Wakatime = reactCreateClass({
                         changeExtensionState('notLogging');
                     }
                 });
+
 
                 that.setState({
                     user: {
@@ -68,18 +89,19 @@ var Wakatime = reactCreateClass({
                         username: data.username
                     },
                     loggedIn: true,
-                    global_rank: null
+                    globalRank: null
                 });
 
-                wakatime.getTotalTimeLoggedToday().done(function (grand_total) {
+                wakatime.getTotalTimeLoggedToday().done(function(grand_total) {
                     that.setState({
                         totalTimeLoggedToday: grand_total.text
                     });
                 });
 
+
                 wakatime.getRanking().done(function (rank) {
                     that.setState({
-                        global_rank: rank.text
+                        globalRank: rank.text
                     });
                 });
 
@@ -127,7 +149,10 @@ var Wakatime = reactCreateClass({
                 user: {
                     full_name: null,
                     email: null,
-                    photo: null
+                    photo: null,
+                    display_name: null,
+                    last_project: null,
+                    username: null
                 },
                 loggedIn: false,
                 loggingEnabled: false
@@ -162,12 +187,82 @@ var Wakatime = reactCreateClass({
         });
     },
 
+    _updateLastProjectState: function (last_project) {
+        this.setState({
+            user: {
+                full_name: this.full_name,
+                email: this.email,
+                photo: this.photo,
+                display_name: this.display_name,
+                last_project: last_project,
+                username: this.username
+            },
+        });
+
+        changeExtensionState('allGood');
+
+        chrome.storage.sync.set({
+            loggingEnabled: true
+        });
+    },
+
+    updateEditor: function (event) {
+        var projectName = event.target.value;
+
+        this.setState({
+            projectName: projectName,
+        });
+ 
+        if(projectName == null || projectName == this.defaultProjectName || projectName == this.state.user.last_project){
+            changeExtensionState('allGood');
+        }else{
+            changeExtensionState('allGoodOverride');
+        }
+        
+    },
+
+     handleKeyPress: function(event) {
+        if(event.charCode==13){
+            var projectName = event.target.value;
+
+            this.setState({
+                projectName: projectName,
+            });
+     
+            if(projectName == null || projectName == this.defaultProjectName || projectName == this.state.user.last_project){
+                changeExtensionState('allGood');
+            }else{
+                changeExtensionState('allGoodOverride');
+            }
+            this.toggleEditor;
+        } 
+      },
+
+
+    toggleEditor: function () {
+        var value = false;
+
+        if (this.state.show_project_editor === false) {
+            value = true;
+           
+        } 
+
+        this.setState({
+            show_project_editor: value
+        });
+
+    },
+
     render: function () {
         return (
             <div>
                 <NavBar
                     user={this.state.user}
-                    loggedIn={this.state.loggedIn} />
+                    loggedIn={this.state.loggedIn}
+                    projectName={this.state.projectName}
+                    show_project_editor={this.state.show_project_editor}
+                    updateEditor={this.updateEditor}
+                    toggleEditor={this.toggleEditor} />
                 <div className="container">
                     <div className="row">
                         <div className="col-md-12">
@@ -175,6 +270,7 @@ var Wakatime = reactCreateClass({
                                 disableLogging={this._disableLogging}
                                 enableLogging={this._enableLogging}
                                 loggingEnabled={this.state.loggingEnabled}
+                                handleKeyPress={this.handleKeyPress}
                                 user={this.state.user}
                                 totalTimeLoggedToday={this.state.totalTimeLoggedToday}
                                 logoutUser={this._logoutUser}
