@@ -30,6 +30,7 @@ var Options = createReactClass({
             loggingType: config.loggingType,
             loggingStyle: config.loggingStyle,
             displayAlert: false,
+            defaultProjectName: config.defaultProjectName,
             alertType: config.alert.success.type,
             alertText: config.alert.success.text
         };
@@ -49,7 +50,8 @@ var Options = createReactClass({
             idelist: '',
             projectType: 'last',
             loggingType: config.loggingType,
-            loggingStyle: config.loggingStyle
+            loggingStyle: config.loggingStyle,
+            defaultProjectName: config.defaultProjectName,
         }, function (items) {
             that.setState({
                 theme: items.theme,
@@ -58,13 +60,15 @@ var Options = createReactClass({
                 idelist: items.idelist,
                 projectType: items.projectType,
                 loggingType: items.loggingType,
-                loggingStyle: items.loggingStyle
+                loggingStyle: items.loggingStyle,
+                defaultProjectName: items.defaultProjectName,
             });
 
             that.refs.theme.value = items.theme;
             that.refs.projectType.value = items.projectType;
             that.refs.loggingType.value = items.loggingType;
             that.refs.loggingStyle.value = items.loggingStyle;
+            that.refs.defaultProjectName.value = items.defaultProjectName;
         });
     },
 
@@ -81,6 +85,7 @@ var Options = createReactClass({
         var loggingType = this.refs.loggingType.value.trim();
         var projectType = this.refs.projectType.value.trim();
         var loggingStyle = this.refs.loggingStyle.value.trim();
+        var defaultProjectName = this.refs.defaultProjectName.value.trim();
         // Trimming blacklist and whitelist removes blank lines and spaces.
         var blacklist = that.state.blacklist.trim();
         var whitelist = that.state.whitelist.trim();
@@ -94,7 +99,8 @@ var Options = createReactClass({
             idelist: idelist,
             loggingType: loggingType,
             projectType: projectType,
-            loggingStyle: loggingStyle
+            loggingStyle: loggingStyle,
+            defaultProjectName: defaultProjectName
         }, function () {
             // Set state to be newly entered values.
             that.setState({
@@ -105,6 +111,7 @@ var Options = createReactClass({
                 loggingType: loggingType,
                 projectType: projectType,
                 loggingStyle: loggingStyle,
+                defaultProjectName: defaultProjectName,
                 displayAlert: true
             });
         });
@@ -119,6 +126,12 @@ var Options = createReactClass({
     _updateBlacklistState: function(sites){
         this.setState({
             blacklist: sites
+        });
+    },
+
+    _updateDefaultProjectState: function(event){
+        this.setState({
+            defaultProjectName: event.target.value
         });
     },
 
@@ -208,6 +221,19 @@ var Options = createReactClass({
             </div>
             );
         };
+        
+        var defaultProjectName = function () {
+            
+            return (
+                <div className="form-group">
+                <label className="col-lg-2 control-label">Default Project Name</label>
+
+                <div className="col-lg-10">
+                    <input className="form-control" ref="defaultProjectName" defaultValue="Unknown Project" onChange={that._updateDefaultProjectState} />
+                </div>
+            </div>
+            );
+        };
 
         return (
             <div className="container">
@@ -230,6 +256,8 @@ var Options = createReactClass({
                                     </select>
                                 </div>
                             </div>
+
+                            {(defaultProjectName())}
 
                             {projectType()}
 

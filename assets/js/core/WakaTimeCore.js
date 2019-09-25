@@ -379,26 +379,33 @@ class WakaTimeCore {
      */
     sendAjaxRequestToApi(payload, method = 'POST') {
 
-        fetch(config.heartbeatApiUrl, {
+        var deferredObject = $.Deferred();
+
+        $.ajax({
+            url: config.heartbeatApiUrl,
+            dataType: 'json',
+            contentType: 'application/json',
             method: method,
-            mode: 'cors',
-            credentials: "include",
-            cache: 'no-cache',
-            headers: {
-                "Content-Type": "application/json"
+            data: payload,
+            statusCode: {
+                401: function () {
+                    changeExtensionState('notSignedIn');
+                },
+                201: function () {
+                    // nothing to do here
+                }
             },
-            redirect: 'follow', // manual, *follow, error
-            referrer: 'no-referrer', // no-referrer, *client
-            body: payload,
-        }).then(function (response) {
-          //  console.log(response);
-            if(response.status == 401){
-                changeExtensionState('notSignedIn');
+            success: (response) => {
+                deferredObject.resolve(this);
+            },
+            error: (xhr, status, err) => {
+                console.error(config.heartbeatApiUrl, status, err.toString());
+
+                deferredObject.resolve(this);
             }
-            return response.json();
-        }).then(function (data) {
-            console.log('Sent Heartbeat via fetch data:' + JSON.stringify(data));
         });
+
+        return deferredObject.promise();
 
     }
 
