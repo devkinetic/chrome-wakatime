@@ -262,7 +262,7 @@ class WakaTimeCore {
                 entity: heartbeat.url,
                 type: type,
                 time: moment().format('X'),
-                project: heartbeat.project || '',
+                project: heartbeat.project || config.defaultProjectName,
                 is_debugging: debug,
                 plugin: plugin + '/' + config.version
             });
@@ -338,13 +338,9 @@ class WakaTimeCore {
 
                 heartbeat.url = getDomainFromUrl(heartbeat.url);
                 payload = this._preparePayload(heartbeat, type, debug, project_type, plugin);
-             //   console.log(payload);
+            
                 this.sendAjaxRequestToApi(payload);
-                // do {
-
-                //     reply = this.sendAjaxRequestToApi(payload);
-
-                // } while (this.online == true);
+            
             } else if (loggingType == 'url') {
 
                 type = loggingType;
@@ -358,14 +354,9 @@ class WakaTimeCore {
                 }
 
                 payload = this._preparePayload(heartbeat, type, debug, project_type, plugin);
-               // console.log(payload);
+               
                 this.sendAjaxRequestToApi(payload);
-                // do {
-
-                //     reply = this.sendAjaxRequestToApi(payload);
-
-                // } while (this.online == true);
-
+         
             }
         });
     }

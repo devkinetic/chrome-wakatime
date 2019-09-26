@@ -12,7 +12,7 @@ var config = {
     detectionIntervalInSeconds: 60,
     // Default Project Type
     projectType: 'last',
-     // Default Project Name
+     // Default Project Name if projectname == null
     defaultProjectName: 'Unknown Project',
     // Default logging style
     // Log all except blacklisted sites
@@ -24,6 +24,7 @@ var config = {
     rankingDisplayType: 'global',
     // By default logging is enabled
     loggingEnabled: true,
+    // Projectname reported to wakatime
     projectName: null,
     // Url to which to send the heartbeat
     heartbeatApiUrl: 'https://wakatime.com/api/v1/users/current/heartbeats',
