@@ -166,7 +166,7 @@ class WakaTimeCore {
 
                             if (items.loggingStyle == 'whitelist') {
                                 var heartbeat = this.getHeartbeat(currentActiveTab.url, items.whitelist);
-                                if (heartbeat.url || heartbeat.url.indexOf('@@') > 0) {
+                                if (heartbeat.url && heartbeat.url.indexOf('@@') > 0) {
                                     if (onidelist) {
                                         heartbeat.type = 'app';
                                         this.sendHeartbeat(heartbeat, debug,
