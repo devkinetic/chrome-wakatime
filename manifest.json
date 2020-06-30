@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "WakaTime",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Automatic time tracking for Chrome.",
   "homepage_url": "https://wakatime.com",
   "devtools_page": "devtools.html",
@@ -16,7 +16,8 @@
     "alarms",
     "tabs",
     "storage",
-    "idle"
+    "idle",
+    "unlimitedStorage"
   ],
   "background": {
     "scripts": [

@@ -1,8 +1,10 @@
-/* global browser */
+/* global chrome */
 
 var React = require('react');
-var reactCreateClass = require('create-react-class');
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+
+var createReactClass = require('create-react-class');
+var ReactCSSTransitionGroup = require('react-transition-group/CSSTransitionGroup');
+
 
 var config = require('../config');
 
@@ -16,46 +18,57 @@ var SitesList = require('./SitesList.jsx');
  *
  * @type {*|Function}
  */
-var Options = reactCreateClass({
+var Options = createReactClass({
 
     getInitialState: function () {
         return {
             theme: config.theme,
             blacklist: '',
             whitelist: '',
+            idelist: '',
+            projectType: 'last',
             loggingType: config.loggingType,
             loggingStyle: config.loggingStyle,
             displayAlert: false,
+            defaultProjectName: config.defaultProjectName,
             alertType: config.alert.success.type,
             alertText: config.alert.success.text
         };
     },
 
     componentDidMount: function () {
-        this.restoreSettings();
+         this.restoreSettings();
     },
 
     restoreSettings: function () {
         var that = this;
 
-        browser.storage.sync.get({
+        chrome.storage.sync.get({
             theme: config.theme,
             blacklist: '',
             whitelist: '',
+            idelist: '',
+            projectType: 'last',
             loggingType: config.loggingType,
-            loggingStyle: config.loggingStyle
-        }).then(function (items) {
+            loggingStyle: config.loggingStyle,
+            defaultProjectName: config.defaultProjectName,
+        }, function (items) {
             that.setState({
                 theme: items.theme,
                 blacklist: items.blacklist,
                 whitelist: items.whitelist,
+                idelist: items.idelist,
+                projectType: items.projectType,
                 loggingType: items.loggingType,
-                loggingStyle: items.loggingStyle
+                loggingStyle: items.loggingStyle,
+                defaultProjectName: items.defaultProjectName,
             });
 
             that.refs.theme.value = items.theme;
+            that.refs.projectType.value = items.projectType;
             that.refs.loggingType.value = items.loggingType;
             that.refs.loggingStyle.value = items.loggingStyle;
+            that.refs.defaultProjectName.value = items.defaultProjectName;
         });
     },
 
@@ -70,26 +83,35 @@ var Options = reactCreateClass({
 
         var theme = this.refs.theme.value.trim();
         var loggingType = this.refs.loggingType.value.trim();
+        var projectType = this.refs.projectType.value.trim();
         var loggingStyle = this.refs.loggingStyle.value.trim();
+        var defaultProjectName = this.refs.defaultProjectName.value.trim();
         // Trimming blacklist and whitelist removes blank lines and spaces.
         var blacklist = that.state.blacklist.trim();
         var whitelist = that.state.whitelist.trim();
+        var idelist = that.state.idelist.trim();
 
         // Sync options with google storage.
-        browser.storage.sync.set({
+        chrome.storage.sync.set({
             theme: theme,
             blacklist: blacklist,
             whitelist: whitelist,
+            idelist: idelist,
             loggingType: loggingType,
-            loggingStyle: loggingStyle
-        }).then(function () {
+            projectType: projectType,
+            loggingStyle: loggingStyle,
+            defaultProjectName: defaultProjectName
+        }, function () {
             // Set state to be newly entered values.
             that.setState({
                 theme: theme,
                 blacklist: blacklist,
-                whitelist: whitelist,
+                whitelist: whitelist, 
+                idelist: idelist,
                 loggingType: loggingType,
+                projectType: projectType,
                 loggingStyle: loggingStyle,
+                defaultProjectName: defaultProjectName,
                 displayAlert: true
             });
         });
@@ -107,10 +129,28 @@ var Options = reactCreateClass({
         });
     },
 
+    _updateDefaultProjectState: function(event){
+        this.setState({
+            defaultProjectName: event.target.value
+        });
+    },
+
     _updateWhitelistState: function(sites){
         this.setState({
             whitelist: sites
         });
+    },
+
+        _updateIdelistState: function(sites){
+            this.setState({
+                idelist: sites
+            });
+    },
+       
+    _updateTypeState: function(type){
+            this.setState({
+                projectType: type
+            });
     },
 
     render: function () {
@@ -132,6 +172,7 @@ var Options = reactCreateClass({
 
         var loggingStyle = function () {
 
+
             if (that.state.loggingStyle == 'blacklist') {
                 return (
                     <SitesList
@@ -150,7 +191,48 @@ var Options = reactCreateClass({
                   placeholder="http://google.com&#10;http://myproject.com@@MyProject"
                   helpText="Sites that you want to show in your reports. You can assign URL to project by adding @@YourProject at the end of line." />
             );
+            
+        };
 
+
+        var ideList = function () {
+            
+            return (
+                <SitesList
+                    handleChange={that._updateIdelistState}
+                    label="Idelist"
+                    sites={that.state.idelist}
+                    helpText="Sites that you want to show in your reports as codeing." />
+            );
+        };
+        
+        var projectType = function () {
+            
+            return (
+                <div className="form-group">
+                <label className="col-lg-2 control-label">Project Selection</label>
+
+                <div className="col-lg-10">
+                    <select className="form-control" ref="projectType" defaultValue="last" onChange={that._updateTypeState}>
+                        <option value="last">The last project reported to Wakatime</option>
+                        <option value="unknown">Unknown/New project</option>
+                    </select>
+                </div>
+            </div>
+            );
+        };
+        
+        var defaultProjectName = function () {
+            
+            return (
+                <div className="form-group">
+                <label className="col-lg-2 control-label">Default Project Name</label>
+
+                <div className="col-lg-10">
+                    <input className="form-control" ref="defaultProjectName" defaultValue="Unknown Project" onChange={that._updateDefaultProjectState} />
+                </div>
+            </div>
+            );
         };
 
         return (
@@ -175,7 +257,13 @@ var Options = reactCreateClass({
                                 </div>
                             </div>
 
+                            {(defaultProjectName())}
+
+                            {projectType()}
+
                             {loggingStyle()}
+
+                            {ideList()}
 
                             <div className="form-group">
                                 <label className="col-lg-2 control-label">Logging type</label>
@@ -189,7 +277,7 @@ var Options = reactCreateClass({
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="theme" className="col-lg-2 control-label">Theme</label>
+                                <label htmlFor="theme" className="col-lg-2 control-label">Icon Theme</label>
 
                                 <div className="col-lg-10">
                                     <select className="form-control" ref="theme" defaultValue="light">

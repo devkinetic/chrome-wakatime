@@ -1,4 +1,4 @@
-/* global browser */
+/* global chrome */
 
 var config = require('../config');
 
@@ -16,7 +16,7 @@ function changeExtensionTooltip(text) {
         text = config.name + ' - ' + text;
     }
 
-    browser.browserAction.setTitle({title: text});
+    chrome.browserAction.setTitle({title: text});
 }
 
 module.exports = changeExtensionTooltip;

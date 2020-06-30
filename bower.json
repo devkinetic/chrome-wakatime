@@ -9,6 +9,7 @@
   ],
   "dependencies": {
     "font-awesome": "~4.6.3",
-    "bootstrap": "~3.3.4"
+    "bootstrap": "~3.3.4",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
   }
 }
